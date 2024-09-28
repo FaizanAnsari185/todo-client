@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = "http://localhost:5000";
 const TodoApp = () => {
   const [todo, setTodo] = useState("");
-
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,6 +27,13 @@ const TodoApp = () => {
     console.log(id);
     await deleteTodo(id);
     await fetchTodos();
+  };
+
+  const handleUpdate = async (item) => {
+    console.log(item.title);
+    setTodo(item.title)
+    // await UpdateTodo(id);
+    // await fetchTodos();
   };
 
   useEffect(() => {
@@ -83,6 +89,23 @@ const TodoApp = () => {
     }
   };
 
+  const UpdateTodo = async (id) => {
+    try {
+      const response = await fetch(`${BASE_URL}/task/${id}`, {
+        method: "PUT", // Specify DELETE method to tell server to delete the resource
+        headers: { "Content-Type": "application/json" }, // Set content type to JSON
+        body: JSON.stringify({ title: todo }), // Convert postData object to JSON string
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update todo");
+      }
+      // Optionally, you can refresh or refetch the todos list after deletion
+    } catch (error) {
+      setError(error.message); // Handle error
+    }
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -117,6 +140,12 @@ const TodoApp = () => {
               className="border-2 border-black bg-red-500 text-black"
             >
               delete
+            </button>
+            <button
+              onClick={() => handleUpdate(todo)}
+              className="border-2 border-black bg-blue-500 text-black"
+            >
+              Update
             </button>
           </div>
         ))}
